@@ -10,6 +10,10 @@
     text-align: center;
 }
 
+.panel h1 {
+    margin-bottom: 20px;
+}
+
 .item {
     display: flex;
 }
@@ -33,6 +37,7 @@
 .content h2 {
     font-size: 16px;
     font-weight: bold;
+    margin-top: 10px;
     margin-bottom: 10px;
 }
 
@@ -55,27 +60,48 @@
 .form-item-container .form-column {
     grid-column: 2;
     display:grid;
+    /* grid-template-columns: fr fr; */
     grid-template-columns: fr fr;
-    flex-direction: column;
+    align-content: start;
+    row-gap: 20px;
 }
 
-.form-item-container .form-column .form-group {
-    padding-bottom: 12px;
-}
-
-.form-item-container .form-column .form-group label {
-    background-color: aqua;
+.form-item-container .form-column label {
+    justify-self: end;
+    align-self: center;
     grid-column: 1;
 }
 
-.form-item-container .form-column .form-group input {
-    background-color: brown;
+.form-item-container .form-column input {
+    place-self: center;
+    grid-column: 2;
+    font-size: larger;
 }
 
-.form-item-container .form-actions {
+.form-item-container .form-column .form-actions {
+    grid-column: span 2;
+}
+
+.battle-item-container {
+    display: grid;
+}
+
+.battle-item-container .battle-actions {
     grid-column: span 2;
 }
 
 input {
     font-size: large;
+}
+
+.button {
+    background-color:  lightgrey;
+    border: none;
+    color: grey;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    text-decoration: none;
 }
