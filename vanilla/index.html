@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vanilla JavaScript</title>
+    <link rel="stylesheet" href="/reset.css">
     <link rel="stylesheet" href="/site.css">
 </head>
 
@@ -14,7 +15,7 @@
             <h1>Vanilla JavaScript</h1>
             <div class="item" data-character-id="1">
                 <div class="thumbnail">
-                    <img src="https://via.placeholder.com/150" alt="Character 1">
+                    <img src="https://placehold.co/100x100" alt="Character 1">
                 </div>
                 <div class="content">
                     <h2>Title 1</h2>
@@ -23,7 +24,7 @@
             </div>
             <div class="item" data-character-id="2">
                 <div class="thumbnail">
-                    <img src="https://via.placeholder.com/150" alt="Character 2">
+                    <img src="https://placehold.co/100x100" alt="Character 2">
                 </div>
                 <div class="content">
                     <h2>Title 2</h2>
@@ -32,13 +33,58 @@
             </div>
             <div class="item" data-character-id="3">
                 <div class="thumbnail">
-                    <img src="https://via.placeholder.com/150" alt="Character 3">
+                    <img src="https://placehold.co/100x100" alt="Character 3">
                 </div>
                 <div class="content">
                     <h2>Title 3</h2>
                     <p>Summary 3</p>
                 </div>
             </div>
+        </div>
+        <div class="panel">
+            <h1>Edit Character</h1>
+            <form>
+                <div class="form-item-container">
+
+                    <div class="portrait">
+                        <img src="https://placehold.co/300x300" alt="Character 3">
+                        <input type="file" id="character-image" name="character-image" accept="image/*">
+                        <label for="character-image">Image:</label>
+                    </div>
+
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="character-name">Name:</label>
+                            <input type="text" id="character-text" name="character-text">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="character-physical">Physical:</label>
+                            <input type="number" id="character-physical" name="character-physical">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="character-mental">Mental:</label>
+                            <input type="number" id="character-mental" name="character-mental">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="character-psychic">Psychic:</label>
+                            <input type="number" id="character-psychic" name="character-psychic">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="character-influence">Influence:</label>
+                            <input type="number" id="character-influence" name="character-influence">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="character-skill">Skill:</label>
+                            <input type="number" id="character-skill" name="character-skill">
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     <script src="main.js"></script>

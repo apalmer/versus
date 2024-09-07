@@ -40,3 +40,42 @@
     font-size: 14px;
     margin-bottom: 10px;
 }
+
+.form-item-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 10px;
+}
+
+.form-item-container .portrait {
+    grid-column: 1;
+    justify-self: end;
+}
+
+.form-item-container .form-column {
+    grid-column: 2;
+    display:grid;
+    grid-template-columns: fr fr;
+    flex-direction: column;
+}
+
+.form-item-container .form-column .form-group {
+    padding-bottom: 12px;
+}
+
+.form-item-container .form-column .form-group label {
+    background-color: aqua;
+    grid-column: 1;
+}
+
+.form-item-container .form-column .form-group input {
+    background-color: brown;
+}
+
+.form-item-container .form-actions {
+    grid-column: span 2;
+}
+
+input {
+    font-size: large;
+}
