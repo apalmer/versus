@@ -11,37 +11,42 @@
 
 <body>
     <div class="container">
-        <div class="panel">
+        <div id="list-characters" class="panel">
             <h1>Vanilla JavaScript</h1>
-            <div class="item" data-character-id="1">
-                <div class="thumbnail">
-                    <img src="https://placehold.co/100x100" alt="Character 1">
+            <div class="character-item-wrapper">
+                <div class="character-item character-item-actions">
+                    <input class="button" type="button" value="Add Character" /> 
                 </div>
-                <div class="content">
-                    <h2>Title 1</h2>
-                    <p>Summary 1</p>
+                <div class="character-item" data-character-id="1">
+                    <div class="character-thumbnail">
+                        <img src="https://placehold.co/100x100" alt="Character 1">
+                    </div>
+                    <div class="character-details">
+                        <h2>Title 1</h2>
+                        <p>Summary 1</p>
+                    </div>
                 </div>
-            </div>
-            <div class="item" data-character-id="2">
-                <div class="thumbnail">
-                    <img src="https://placehold.co/100x100" alt="Character 2">
+                <div class="character-item" data-character-id="2">
+                    <div class="character-thumbnail">
+                        <img src="https://placehold.co/100x100" alt="Character 2">
+                    </div>
+                    <div class="character-details">
+                        <h2>Title 2</h2>
+                        <p>Summary 2</p>
+                    </div>
                 </div>
-                <div class="content">
-                    <h2>Title 2</h2>
-                    <p>Summary 2</p>
-                </div>
-            </div>
-            <div class="item" data-character-id="3">
-                <div class="thumbnail">
-                    <img src="https://placehold.co/100x100" alt="Character 3">
-                </div>
-                <div class="content">
-                    <h2>Title 3</h2>
-                    <p>Summary 3</p>
+                <div class="character-item" data-character-id="3">
+                    <div class="character-thumbnail">
+                        <img src="https://placehold.co/100x100" alt="Character 3">
+                    </div>
+                    <div class="character-details">
+                        <h2>Title 3</h2>
+                        <p>Summary 3</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="panel">
+        <div id="edit-character" class="panel">
             <h1>Edit Character</h1>
             <form>
                 <div class="form-item-container">
@@ -72,31 +77,29 @@
                         <input type="number" id="character-skill" name="character-skill">
 
                         <div class="form-actions">
-                            <input class="button" type="button" value="Save" />
+                            <input id="save-character" class="button" type="button" value="Save" />
                         </div>
                     </div>
                 </div>
             </form>
         </div>
-        <div class="panel">
+        <div id="battle-characters" class="panel">
             <h1>Battle Characters</h1>
             <form>
-                <div class="battle-item-container">
-
-                    <div class="character1">
-                        <img src="https://placehold.co/300x300" alt="Character 3">
+                <div class="battle-container">
+                    <div class="battle-character">
+                        <img src="https://placehold.co/300x300" alt="Character 1">
                         <label for="character-image">Character 1</label>
                     </div>
 
-                    <div class="character2">
-                        <img src="https://placehold.co/300x300" alt="Character 3">
+                    <div class="battle-character">
+                        <img src="https://placehold.co/300x300" alt="Character 2">
                         <label for="character-image">character 2</label>
                     </div>
 
                     <div class="battle-actions">
-                        <input class="button" type="button" value="Battle!" />
+                        <input class="button" type="button" value="Battle" />
                     </div>
-
                 </div>
             </form>
         </div>
