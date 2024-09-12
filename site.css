@@ -45,7 +45,15 @@ html {
 }
 
 .character-item.selected {
-    background-color: green;
+    background-color: orange;
+}
+
+.character-item.winner {
+    background-color: greenyellow;
+}
+
+.character-item.loser {
+    background-color: red;
 }
 
 .character-item-actions {

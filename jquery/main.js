@@ -21,6 +21,7 @@ $(function () {
 
   let selectedCharacterIds = [];
   let battleCharacters = {};
+  let battleResults = {};
 
   let convertFromFirestoreDTO = (doc) => {
     if (doc.fields) {
@@ -175,7 +176,9 @@ $(function () {
       psychic: $("#character-psychic").val(),
       influence: $("#character-influence").val(),
       skill: $("#character-skill").val(),
-      portrait: $("#character-portrait").attr("src")
+      portrait: $("#character-portrait").attr("src"),
+      wins: 0,
+      losses: 0
     }
     
     let data = convertToFirestoreDTO(character);
@@ -261,7 +264,7 @@ $(function () {
 
       $("#list-characters .character-item-wrapper .character").remove();
       selectedCharacterIds = [];
-      battleCharacters = [];
+      battleCharacters = {};
 
       let characters = [];
       if(data.documents) {
@@ -300,6 +303,7 @@ $(function () {
     });
 
     $("#battle").on("click", (e) => {
+      battle();
       loadCharacterList();
       $(".panel").hide();
       $("#list-characters").show();
@@ -339,6 +343,14 @@ $(function () {
       uploadPortrait();
     });
 
+  };
+
+  let battle = () => {
+    battleResults.winner = battleCharacters["battler1"];
+    battleResults.loser = battleCharacters["battler2"];
+
+    $(`[data-character-id="${battleResults.winner.id}"]`).toggleClass("selected").toggleClass("winner");
+    $(`[data-character-id="${battleResults.loser.id}"]`).toggleClass("selected").toggleClass("loser");
   };
 
   loadCharacterList();
