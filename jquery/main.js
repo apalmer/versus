@@ -162,9 +162,10 @@ $(function () {
 
     uploadBytes(portraitRef, file)
       .then((snapshot) => {
-        return getDownloadURL(snapshot.ref);})
-      .then((downloadUrl) =>{
-        $("#character-portrait").attr('src',downloadUrl);
+        return getDownloadURL(snapshot.ref);
+      })
+      .then((downloadUrl) => {
+        $("#character-portrait").attr('src', downloadUrl);
       });
   };
 
@@ -180,7 +181,7 @@ $(function () {
       wins: 0,
       losses: 0
     }
-    
+
     let data = convertToFirestoreDTO(character);
 
     $.ajax({
@@ -256,7 +257,7 @@ $(function () {
     $("#character-psychic").val(character.psychic);
     $("#character-influence").val(character.influence);
     $("#character-skill").val(character.skill);
-    $("#character-portrait").attr('src',character.portrait);
+    $("#character-portrait").attr('src', character.portrait);
   };
 
   let loadCharacterList = () => {
@@ -267,7 +268,7 @@ $(function () {
       battleCharacters = {};
 
       let characters = [];
-      if(data.documents) {
+      if (data.documents) {
         characters = data.documents
           .map(convertFromFirestoreDTO)
           .filter(e => !!e);
@@ -303,10 +304,11 @@ $(function () {
     });
 
     $("#battle").on("click", (e) => {
-      battle();
-      loadCharacterList();
-      $(".panel").hide();
-      $("#list-characters").show();
+      battle(() => {
+        loadCharacterList();
+        $(".panel").hide();
+        $("#list-characters").show();
+      });
     });
 
     $(".character-item-wrapper").on("click", ".launch-delete-character", (e) => {
@@ -345,12 +347,54 @@ $(function () {
 
   };
 
-  let battle = () => {
-    battleResults.winner = battleCharacters["battler1"];
-    battleResults.loser = battleCharacters["battler2"];
+  let executeAttackAnimation = (attackerSelector, defenderSelector, attackerOnLeft, done) => {
 
-    $(`[data-character-id="${battleResults.winner.id}"]`).toggleClass("selected").toggleClass("winner");
-    $(`[data-character-id="${battleResults.loser.id}"]`).toggleClass("selected").toggleClass("loser");
+    let directionModifier = attackerOnLeft ? 1 : -1;
+
+    $(attackerSelector).css("position", "relative")
+      .animate({ left: (directionModifier * -50) }, 500, "linear", () => { })
+      .animate({ left: (directionModifier * 100) }, 100, "linear", () => { })
+      .queue((next) => {
+
+        $(defenderSelector).css("position", "relative")
+          .animate({ left: (directionModifier * -100) }, 50, "linear", () => { })
+          .animate({ left: (directionModifier * 100) }, 50, "linear", () => { })
+          .animate({ left: (directionModifier * -10) }, 50, "linear", () => { })
+          .animate({ left: (directionModifier * 10) }, 50, "linear", () => { })
+          .animate({ left: (directionModifier * 0) }, 50, "linear", () => { });
+
+        next();
+      })
+      .animate({ left: (directionModifier * 50) }, 50, "linear", () => { })
+      .animate({ left: (directionModifier * 0) }, 50, "linear", done)
+
+  }
+
+  let battle = (done) => {
+
+    let executeDefenderAttackAnimation = (done) => {
+      return () => {
+        executeAttackAnimation("#battler2", "#battler1", false, done);
+      };
+    }
+
+    let cleanUpBattle = () => {
+      battleResults.winner = battleCharacters["battler1"];
+      battleResults.loser = battleCharacters["battler2"];
+
+      $('.battler-portrait').attr("src", "https://placehold.co/300x300");
+
+      $(`[data-character-id="${battleResults.winner.id}"]`).toggleClass("selected").toggleClass("winner");
+      $(`[data-character-id="${battleResults.loser.id}"]`).toggleClass("selected").toggleClass("loser");
+
+      if (done) {
+        done();
+      }
+    }
+
+
+    executeAttackAnimation("#battler1", "#battler2", true, executeDefenderAttackAnimation(cleanUpBattle));
+
   };
 
   loadCharacterList();
