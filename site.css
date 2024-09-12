@@ -101,9 +101,18 @@ html {
     row-gap: 10px;
 }
 
-    .form-item-container .portrait {
+    .form-item-container .form-portrait {
         grid-column: 1;
         justify-self: end;
+    }
+
+    .form-item-container .form-portrait .portrait-image {
+        width: 300px;
+        height: 300px;
+    }
+
+    .portrait-uploader-input {
+        display: none;
     }
 
     .form-item-container .form-column {
@@ -140,6 +149,10 @@ html {
         display: flex;
         flex-direction: column;
     }
+    .battle-container .battle-character .battler-portrait {
+        width: 300px;
+        height: 300px;
+    }
 
     .battle-container .battle-actions {
         grid-column: span 2;
@@ -159,6 +172,7 @@ input {
     display: inline-block;
     font-size: 20px;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .inactive {

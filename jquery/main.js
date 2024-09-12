@@ -1,7 +1,23 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+
 $(function () {
   // Handler for .ready() called.
-  let apiKey = 'AIzaSyANFePxXmSbZxaKwtwYzj8OpEW0rT1yWSQ';
-  let projectId = 'versus-6d00a'
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyANFePxXmSbZxaKwtwYzj8OpEW0rT1yWSQ",
+    authDomain: "versus-6d00a.firebaseapp.com",
+    projectId: "versus-6d00a",
+    storageBucket: "versus-6d00a.appspot.com",
+    messagingSenderId: "388840967266",
+    appId: "1:388840967266:web:2e6529c5361cc5a9d5553b"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+
+  // Initialize Cloud Storage and get a reference to the service
+  const firebaseStorage = getStorage(app);
 
   let selectedCharacterIds = [];
   let battleCharacters = {};
@@ -66,7 +82,7 @@ $(function () {
       buffer +=
         `<div class="character-item character" data-character-id="${character.id}">
               <div class="character-thumbnail">
-                  <img src="${character.thumbnail || "https://placehold.co/100x100"}" alt="Character ${character.id}">
+                  <img src="${character.portrait || "https://placehold.co/100x100"}" alt="Character ${character.id}">
               </div>
               <div class="character-details">
                   <div class="character-details-header">
@@ -86,7 +102,7 @@ $(function () {
 
   let getCharacters = (onLoad) => {
     $.ajax({
-      url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+      url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
       method: 'POST',
       data: {
         returnSecureToken: true
@@ -94,7 +110,7 @@ $(function () {
       success: function (response) {
         var idToken = response.idToken;
         $.ajax({
-          url: `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/characters`,
+          url: `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/characters`,
           method: 'GET',
           headers: {
             'Authorization': 'Bearer ' + idToken
@@ -113,7 +129,7 @@ $(function () {
 
   let getCharacter = (characterId, onLoad) => {
     $.ajax({
-      url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+      url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
       method: 'POST',
       data: {
         returnSecureToken: true
@@ -138,6 +154,19 @@ $(function () {
     });
   };
 
+  let uploadPortrait = () => {
+    let file = $("#character-portrait-uploader").prop('files')[0];
+
+    const portraitRef = ref(firebaseStorage, file.name);
+
+    uploadBytes(portraitRef, file)
+      .then((snapshot) => {
+        return getDownloadURL(snapshot.ref);})
+      .then((downloadUrl) =>{
+        $("#character-portrait").attr('src',downloadUrl);
+      });
+  };
+
   let saveCharacter = (character, onSave) => {
     character = character || {
       name: $("#character-name").val(),
@@ -145,13 +174,14 @@ $(function () {
       mental: $("#character-mental").val(),
       psychic: $("#character-psychic").val(),
       influence: $("#character-influence").val(),
-      skill: $("#character-skill").val()
+      skill: $("#character-skill").val(),
+      portrait: $("#character-portrait").attr("src")
     }
-
+    
     let data = convertToFirestoreDTO(character);
 
     $.ajax({
-      url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+      url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
       method: 'POST',
       data: {
         returnSecureToken: true
@@ -159,7 +189,7 @@ $(function () {
       success: function (response) {
         var idToken = response.idToken;
         $.ajax({
-          url: `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/characters`,
+          url: `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/characters`,
           method: 'POST',
           headers: {
             'Authorization': 'Bearer ' + idToken
@@ -180,7 +210,7 @@ $(function () {
 
   let deleteCharacter = (characterId, onDelete) => {
     $.ajax({
-      url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+      url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
       method: 'POST',
       data: {
         returnSecureToken: true
@@ -213,7 +243,8 @@ $(function () {
       mental: 5,
       psychic: 5,
       influence: 5,
-      skill: 5
+      skill: 5,
+      portrait: "https://placehold.co/300x300"
     };
 
     $("#character-name").val(character.name);
@@ -222,6 +253,7 @@ $(function () {
     $("#character-psychic").val(character.psychic);
     $("#character-influence").val(character.influence);
     $("#character-skill").val(character.skill);
+    $("#character-portrait").attr('src',character.portrait);
   };
 
   let loadCharacterList = () => {
@@ -231,9 +263,12 @@ $(function () {
       selectedCharacterIds = [];
       battleCharacters = [];
 
-      let characters = data.documents
-        .map(convertFromFirestoreDTO)
-        .filter(e => !!e);
+      let characters = [];
+      if(data.documents) {
+        characters = data.documents
+          .map(convertFromFirestoreDTO)
+          .filter(e => !!e);
+      }
 
       renderCharacters(characters);
     });
@@ -244,6 +279,7 @@ $(function () {
       let character = convertFromFirestoreDTO(data);
       battleCharacters[slot] = character;
 
+      $(`#${slot} .battler-portrait`).attr("src", battleCharacters[slot].portrait);
       $(`#${slot} .battler-name`).text(battleCharacters[slot].name);
     };
   };
@@ -299,7 +335,9 @@ $(function () {
       }
     });
 
-
+    $("#character-portrait-uploader").on("change", (e) => {
+      uploadPortrait();
+    });
 
   };
 

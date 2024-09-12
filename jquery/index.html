@@ -23,11 +23,12 @@
             <form>
                 <div class="form-item-container">
 
-                    <div class="portrait">
-                        <img src="https://placehold.co/300x300" alt="Character 3">
-                        <input type="file" id="character-image" name="character-image" accept="image/*">
+                    <div class="form-portrait">
+                        <img id="character-portrait" class="portrait-image" src="https://placehold.co/300x300" alt="Character 3">
+                        <label for="character-portrait-uploader" class="button">Upload</label>    
+                        <input id="character-portrait-uploader" class="portrait-uploader-input" type="file" id="character-image" name="character-image" accept="image/*">
                         <!-- <label for="character-image">Image</label> -->
-                    </div>
+                    </div> 
 
                     <div class="form-column">
                         <label for="character-name">Name:</label>
@@ -77,9 +78,8 @@
         </div>
     </div>
 
-
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="main.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 
 </html>
