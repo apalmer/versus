@@ -60,6 +60,10 @@ $(function () {
 
     Object.entries(character).forEach(element => {
       let [key, value] = element
+      if(key === "id"){
+        return;
+      }
+      
       if (typeof value === "number") {
         dto.fields[key] = { integerValue: value.toString() };
       }
@@ -89,11 +93,12 @@ $(function () {
                   <div class="character-details-header">
                     <div class="character-title"><h2>${character.name}</h2></div>
                     <!-- <div class="launch-edit-character" >E</div> -->
-                    <div class="launch-delete-character" >
-                      <img src="/images/close.png" alt="Delete character">
-                    </div>
+                    <div class="character-wins">${character.wins}</div>
                   </div>
                   <p>${character.catchphrase || ''}</p>
+              </div>
+              <div class="launch-delete-character" >
+                <img src="/images/close.png" alt="Delete character">
               </div>
           </div>`;
     });
@@ -111,7 +116,7 @@ $(function () {
       success: function (response) {
         var idToken = response.idToken;
         $.ajax({
-          url: `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/characters`,
+          url: `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/characters?orderBy=wins%20desc`,
           method: 'GET',
           headers: {
             'Authorization': 'Bearer ' + idToken
@@ -169,6 +174,38 @@ $(function () {
       });
   };
 
+  let updateCharacter = (character, onSave) => {
+    
+    let data = convertToFirestoreDTO(character);
+
+    $.ajax({
+      url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
+      method: 'POST',
+      data: {
+        returnSecureToken: true
+      },
+      success: function (response) {
+        var idToken = response.idToken;
+        $.ajax({
+          url: `https://firestore.googleapis.com/v1/${character.id}`,
+          method: 'PATCH',
+          headers: {
+            'Authorization': 'Bearer ' + idToken
+          },
+          data: JSON.stringify(data),
+          contentType: 'application/json',
+          success: onSave,
+          error: function (error) {
+            console.error(error);
+          }
+        });
+      },
+      error: function (error) {
+        console.error(error);
+      }
+    });
+  };
+
   let saveCharacter = (character, onSave) => {
     character = character || {
       name: $("#character-name").val(),
@@ -183,6 +220,10 @@ $(function () {
     }
 
     let data = convertToFirestoreDTO(character);
+
+    if(character.id){
+      return updateCharacter(character, onSave);
+    }
 
     $.ajax({
       url: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
@@ -312,13 +353,14 @@ $(function () {
     });
 
     $(".character-item-wrapper").on("click", ".launch-delete-character", (e) => {
+      e.preventDefault();
       let characterId = $(e.target).closest('.character').data('characterId');
       deleteCharacter(characterId, (data) => {
         loadCharacterList();
       });
     });
 
-    $(".character-item-wrapper").on("click", ".character-item.character", (e) => {
+    $(".character-item-wrapper").on("click", ".character", (e) => {
       let $target = $(e.currentTarget);
       let characterId = $target.closest('.character').data('characterId');
 
@@ -348,6 +390,7 @@ $(function () {
   };
 
   let executeAttackAnimation = (attackerSelector, defenderSelector, attackerOnLeft, done) => {
+    console.log("attack animation");
 
     let directionModifier = attackerOnLeft ? 1 : -1;
 
@@ -355,7 +398,7 @@ $(function () {
       .animate({ left: (directionModifier * -50) }, 500, "linear", () => { })
       .animate({ left: (directionModifier * 100) }, 100, "linear", () => { })
       .queue((next) => {
-
+        console.log("queued defender")
         $(defenderSelector).css("position", "relative")
           .animate({ left: (directionModifier * -100) }, 50, "linear", () => { })
           .animate({ left: (directionModifier * 100) }, 50, "linear", () => { })
@@ -370,30 +413,54 @@ $(function () {
 
   }
 
+  let saveBattleResults = (done) => {
+
+    return () => {
+      console.log("save results");
+     
+      battleResults.winner = battleCharacters["battler1"];
+      battleResults.loser = battleCharacters["battler2"]; 
+
+      if (battleResults.winner) {
+        battleResults.winner.wins = battleResults.winner.wins + 1;
+        saveCharacter(battleResults.winner);
+      }
+
+      if (done) {
+        return done();
+      }
+    }
+  }
+
   let battle = (done) => {
+    console.log("on battle");
 
     let executeDefenderAttackAnimation = (done) => {
       return () => {
+        console.log("on defender attack animation");
+
         executeAttackAnimation("#battler2", "#battler1", false, done);
       };
     }
 
-    let cleanUpBattle = () => {
-      battleResults.winner = battleCharacters["battler1"];
-      battleResults.loser = battleCharacters["battler2"];
+    let cleanUpBattle = (done) => {
+      return () => {
+        console.log("cleaning up battle");
 
-      $('.battler-portrait').attr("src", "https://placehold.co/300x300");
+        $('.battler-portrait').attr("src", "https://placehold.co/300x300");
 
-      $(`[data-character-id="${battleResults.winner.id}"]`).toggleClass("selected").toggleClass("winner");
-      $(`[data-character-id="${battleResults.loser.id}"]`).toggleClass("selected").toggleClass("loser");
+        $(`[data-character-id="${battleResults.winner.id}"]`).toggleClass("selected").toggleClass("winner");
+        $(`[data-character-id="${battleResults.loser.id}"]`).toggleClass("selected").toggleClass("loser");
 
-      if (done) {
-        done();
+        if (done) {
+          console.log("done")
+          return done();
+        }
       }
     }
 
 
-    executeAttackAnimation("#battler1", "#battler2", true, executeDefenderAttackAnimation(cleanUpBattle));
+    executeAttackAnimation("#battler1", "#battler2", true, executeDefenderAttackAnimation(saveBattleResults(cleanUpBattle(done))));
 
   };
 
