@@ -5,15 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>React</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/site.css">
 </head>
 
 <body>
-    <h1>React</h1>
+    <main id="app"></main>
 
     <!-- Your content goes here -->
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="main.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/htm@3.1.1/dist/htm.js"></script>
+    <script type="module">
+        import App from "./components/App.js";
+
+        const html = htm.bind(React.createElement);
+
+        let root = ReactDOM.createRoot(document.getElementById("app"));
+
+        root.render(html`
+            <${App} />
+        `);
+    </script>
+    <input type="button" >
 </body>
 
 </html>
