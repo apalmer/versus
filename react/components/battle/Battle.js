@@ -1,5 +1,3 @@
-import htm from "https://unpkg.com/htm?module";
-
 const html = htm.bind(React.createElement);
 
 function Battle({ battlers, dispatch }) {

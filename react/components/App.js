@@ -1,4 +1,4 @@
-import LeaderBoard from "./character/LeaderBoard.js";
+import LeaderBoard from "./leaderboard/LeaderBoard.js";
 import CharacterEditor from "./character/CharacterEditor.js";
 import Battle from "./battle/Battle.js"
 

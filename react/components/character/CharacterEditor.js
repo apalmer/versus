@@ -18,6 +18,9 @@ function CharacterEditor({ character, dispatch }) {
                                 <label htmlFor="character-name">Name:</label>
                                 <input type="text" id="character-name" name="character-name" />
 
+                                <label htmlFor="character-catchphrase">Catch Phrase:</label>
+                                <input type="text" id="character-catchphrase" name="character-phrase" />
+
                                 <label htmlFor="character-physical">Physical:</label>
                                 <input type="number" id="character-physical" name="character-physical" />
 

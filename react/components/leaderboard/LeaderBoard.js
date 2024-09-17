@@ -1,4 +1,4 @@
-import CharacterList from "./CharacterList.js";
+import CharacterList from "../character/CharacterList.js";
 
 const html = htm.bind(React.createElement);
 
