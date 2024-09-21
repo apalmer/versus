@@ -5,10 +5,12 @@ const html = htm.bind(React.createElement);
 function CharacterList({ characters, dispatch }) {
     
     return html`
-        <div className="character-list text-left">
+        <div key="1" className="character-list text-left">
             <!-- <${CharacterCard} character=${characters[0]} dispatch=${dispatch} /> -->
             ${characters.map((character) => { 
-                return html`<${CharacterCard} key=${character.id} character=${character} dispatch=${dispatch} />`
+                return html`
+                    <${CharacterCard} key=${character.id} character=${character} dispatch=${dispatch} //>
+                `
             })}
         </div>
         `
