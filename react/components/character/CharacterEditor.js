@@ -3,9 +3,10 @@ const html = htm.bind(React.createElement);
 function CharacterEditor({ modifyingCharacter, dispatch }) {
 
         React.useEffect(() => {
+                setCharacter({...defaultCharacter, ...modifyingCharacter});
                 //clean up function
                 return () => { };
-        }, []);
+        }, [modifyingCharacter]);
 
         let defaultCharacter = {
                 name: '',
@@ -29,8 +30,9 @@ function CharacterEditor({ modifyingCharacter, dispatch }) {
         }
 
         let handleSubmit = (e) => {
-                //e.preventDefault();
-                console.log('handleSubmit')
+                e.preventDefault();
+                console.log('handle Submit');
+                dispatch("character.edit.saving", { character });
         }
 
         let handleUpload = (e) => {
@@ -39,7 +41,7 @@ function CharacterEditor({ modifyingCharacter, dispatch }) {
         }
 
         return html`
-                <form onSubmit=${handleSubmit}>
+                <form onSubmit=${handleSubmit} >
                         <h2 className="font-bond text-3xl mb-4" >Edit Character</h2>
                         <div className="grid grid-cols-2 gap-y-4 p-4" >
                                 <div className="flex justify-center align-center"> 
@@ -73,7 +75,7 @@ function CharacterEditor({ modifyingCharacter, dispatch }) {
                                         <input id="character-portrait-uploader"  onChange=${ handleUpload } className="hidden" type="file" accept="image/*" />
                                 </div>
                                 <div className="flex justify-center align-center">
-                                        <input id="save-character" className="button" type="button" value="Save" />
+                                        <input id="save-character" className="button" type="submit" value="Save" />
                                 </div>
                         </div>
                 </form>

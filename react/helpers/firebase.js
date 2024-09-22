@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
-import { getFirestore, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, query, orderBy, limit, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyANFePxXmSbZxaKwtwYzj8OpEW0rT1yWSQ",
@@ -27,8 +27,11 @@ let getCharacters = (callback) => {
     .then((snapshot) => {
       let data = [];
       snapshot.forEach((doc) => {
-        data.push(doc.data());
-      })
+        let character = doc.data();
+        character._id = doc.id;
+        data.push(character);
+      });
+
       if (callback) {
         callback(data);
       }
@@ -50,4 +53,30 @@ let uploadFile = (file, callback) => {
     });
 };
 
-export { getCharacters, uploadFile };
+let upsertCharacter = (character, callback) => {
+  if(character._id){
+    delete character._id;
+  }
+
+  let collRef = collection(db, "characters");
+
+  addDoc(collRef, character)
+    .then((docRef) => {
+      if (callback) {
+        callback(docRef);
+      }
+    });
+}
+
+let deleteCharacter = (character, callback) => {
+  let docRef = doc(db, "characters", character._id);
+
+  deleteDoc(docRef)
+    .then(() => {
+      if (callback) {
+        callback();
+      }
+    });
+}
+
+export { getCharacters, uploadFile, upsertCharacter, deleteCharacter };
