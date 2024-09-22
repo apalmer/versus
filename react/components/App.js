@@ -7,6 +7,10 @@ import Battle from "./battle/Battle.js"
 const html = htm.bind(React.createElement);
 
 function App() {
+    
+    let [appStateMachine, setAppStateMachine] = React.useState({ mode: 'leaderboard' });
+
+    let [isDirty, setIsDirty] = React.useState(false);
 
     let [characters, setCharacters] = React.useState([]);
 
@@ -16,7 +20,32 @@ function App() {
 
     let [battleResults, setBattleResults] = React.useState({ winner: null });
 
-    let [appStateMachine, setAppStateMachine] = React.useState({ mode: 'leaderboard' })
+    let loadCharacters = () => {
+        return getCharacters((chars) => { 
+            setCharacters(chars); 
+            setIsDirty(false);
+        });
+    };
+
+    let uploadPortrait = (file) => {
+        return uploadFile(file, (downloadUrl) => {
+            setModifingCharacter({ ...modifyingCharacter, portrait: downloadUrl })
+        });
+    }
+
+    let saveCharacter = (character) => {
+        return upsertCharacter(character, (doc) => {
+            setIsDirty(true);
+            dispatch("character.edit.saved");
+        });
+    }
+
+    let removeCharacter = (character) => {
+        return deleteCharacter(character, (doc) => {
+            setIsDirty(true);
+            dispatch("character.deleted");
+        });
+    }
 
     let dispatch = (message, payload) => {
         switch (message) {
@@ -30,6 +59,7 @@ function App() {
                 setAppStateMachine({ mode: 'edit' });
                 break;
             case 'character.edited':
+                setModifingCharacter({});
                 setAppStateMachine({ mode: 'leaderboard' });
                 break;
             case 'character.portrait.uploading':
@@ -55,35 +85,9 @@ function App() {
         }
     };
 
-    let loadCharacters = () => {
-        return getCharacters((chars) => { 
-            setCharacters(chars) 
-        });
-    };
-
-    let uploadPortrait = (file) => {
-        return uploadFile(file, (downloadUrl) => {
-            setModifingCharacter({ ...modifyingCharacter, portrait: downloadUrl })
-        });
-    }
-
-    let saveCharacter = (character) => {
-        return upsertCharacter(character, (doc) => {
-            loadCharacters();
-            dispatch("character.edit.saved");
-        });
-    }
-
-    let removeCharacter = (character) => {
-        return deleteCharacter(character, (doc) => {
-            loadCharacters();
-            dispatch("character.deleted");
-        });
-    }
-
     React.useEffect(() => {
         loadCharacters();
-    }, []);
+    }, [isDirty]);
 
     return html`
         <div className="container mx-auto px-36 flex flex-col text-center">
