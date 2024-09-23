@@ -47,6 +47,23 @@ function App() {
         });
     }
 
+    let selectCharacter = (character) => {
+        let filtered = battlers.filter(battler => battler._id !== character._id);
+        if(battlers.length > filtered.length) {
+            setBattlers(filtered);
+        }
+        else if(battlers.length < 2){
+            let nextBattlers = [...battlers, character];
+            setBattlers(nextBattlers);
+        }
+
+        dispatch('character.selected');
+    }
+    
+    let isBattleReady = () => {
+        return battlers.length === 2
+    }
+
     let dispatch = (message, payload) => {
         switch (message) {
             case 'character.deleting':
@@ -71,8 +88,13 @@ function App() {
             case 'character.edit.saved':
                 setAppStateMachine({ mode: 'leaderboard' });
                 break;
+            case 'character.selecting':
+                selectCharacter(payload.character);
+                break;
             case 'character.selected':
-                setAppStateMachine({ mode: 'battle' });
+                if(isBattleReady()){
+                    setAppStateMachine({ mode: 'battle' });
+                }
                 break;
             case 'battlers.selected':
                 setAppStateMachine({ mode: 'battle' });
@@ -92,7 +114,7 @@ function App() {
     return html`
         <div className="container mx-auto px-36 flex flex-col text-center">
             <h1 className="text-3xl font-bold mb-6" >React Versus</h1>
-            ${appStateMachine.mode === 'leaderboard' && html`<${LeaderBoard} characters=${characters} dispatch=${dispatch} //>`
+            ${appStateMachine.mode === 'leaderboard' && html`<${LeaderBoard} characters=${characters} battlers=${battlers} dispatch=${dispatch} //>`
         }
             ${appStateMachine.mode === 'edit' && html`<${CharacterEditor} modifyingCharacter=${modifyingCharacter} dispatch=${dispatch} //>`
         }

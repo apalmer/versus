@@ -1,6 +1,6 @@
 const html = htm.bind(React.createElement);
 
-function CharacterCard({ character, dispatch }) {
+function CharacterCard({ character, battlers, dispatch }) {
 
     let handleCharacterDelete = (e) => {
         dispatch("character.deleting",{ character });
@@ -8,12 +8,12 @@ function CharacterCard({ character, dispatch }) {
     }
 
     let handleCharacterSelect = (e) => {
-        dispatch("character.selected");
+        dispatch("character.selecting", { character });
         console.log("select character");
     }
 
     return html`
-        <div className="bg-white mb-6 flex drop-shadow-xl">
+        <div className=${ `mb-6 flex drop-shadow-xl ${ battlers.find(battler => battler._id === character._id) ? 'bg-yellow-300':'bg-white '}` }>
             <div className="bg-gray-300" > <img className="cursor-pointer w-24 h-24" src=${ character.portrait || "https://placehold.co/100x100"} alt="" onClick=${ handleCharacterSelect } /> </div>
             <div className="flex-grow pl-2"> 
                 <h3 className="cursor-pointer font-bold" onClick=${ handleCharacterSelect } >${character.name}</h3> 

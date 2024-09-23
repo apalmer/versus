@@ -2,7 +2,7 @@ import CharacterList from "../character/CharacterList.js";
 
 const html = htm.bind(React.createElement);
 
-function LeaderBoard ({ characters, dispatch }) {
+function LeaderBoard ({ characters, battlers, dispatch }) {
 
     let handleAdd = (e) => {
         console.log("add character");
@@ -14,7 +14,7 @@ function LeaderBoard ({ characters, dispatch }) {
             <div className="character-actions mb-6" >
                 <input id="add-character" onClick=${ handleAdd } className="button" type="button" value="Add Character" />
             </div>
-            <${ CharacterList } characters=${characters} dispatch=${dispatch} />
+            <${ CharacterList } characters=${characters} battlers=${battlers} dispatch=${dispatch} />
         </div>
         `
 }
