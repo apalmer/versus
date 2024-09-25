@@ -8,7 +8,7 @@ const html = htm.bind(React.createElement);
 
 function App() {
     
-    let [appStateMachine, setAppStateMachine] = React.useState({ mode: 'leaderboard' });
+    let [appStateMachine, setAppStateMachine] = React.useState({ mode: "leaderboard" });
 
     let [isDirty, setIsDirty] = React.useState(false);
 
@@ -18,7 +18,7 @@ function App() {
 
     let [battlers, setBattlers] = React.useState([]);
 
-    let [battleResults, setBattleResults] = React.useState({ winner: null });
+    let [battleResults, setBattleResults] = React.useState({ winner: null, loser: null });
 
     let loadCharacters = () => {
         return getCharacters((chars) => { 
@@ -56,51 +56,58 @@ function App() {
             let nextBattlers = [...battlers, character];
             setBattlers(nextBattlers);
         }
-
-        dispatch('character.selected');
     }
     
-    let isBattleReady = () => {
-        return battlers.length === 2
+    let saveBattleResults = (winner, loser) => {
+        setBattlers([]);
+        setBattleResults({ winner, loser});
+        upsertCharacter(winner, (w) => {
+            upsertCharacter(loser, (l) => { 
+                setIsDirty(true);
+                dispatch("battle.completed");
+            });
+        });
     }
 
     let dispatch = (message, payload) => {
         switch (message) {
-            case 'character.deleting':
+            case "character.deleting":
                 removeCharacter(payload.character);
                 break;
-            case 'character.deleted':
-                setAppStateMachine({ mode: 'leaderboard' });
+            case "character.deleted":
+                setAppStateMachine({ mode: "leaderboard" });
                 break;
-            case 'character.editing':
-                setAppStateMachine({ mode: 'edit' });
+            case "character.editing":
+                setAppStateMachine({ mode: "edit" });
                 break;
-            case 'character.edited':
+            case "character.edited":
                 setModifingCharacter({});
-                setAppStateMachine({ mode: 'leaderboard' });
+                setAppStateMachine({ mode: "leaderboard" });
                 break;
-            case 'character.portrait.uploading':
+            case "character.portrait.uploading":
                 uploadPortrait(payload.file);
                 break;
-            case 'character.edit.saving':
+            case "character.edit.saving":
                 saveCharacter(payload.character);
                 break;
-            case 'character.edit.saved':
-                setAppStateMachine({ mode: 'leaderboard' });
+            case "character.edit.saved":
+                setAppStateMachine({ mode: "leaderboard" });
                 break;
-            case 'character.selecting':
+            case "character.selecting":
                 selectCharacter(payload.character);
                 break;
-            case 'character.selected':
-                if(isBattleReady()){
-                    setAppStateMachine({ mode: 'battle' });
-                }
+            case "character.selected":
+                setAppStateMachine({ mode: "battle" });
                 break;
-            case 'battlers.selected':
-                setAppStateMachine({ mode: 'battle' });
+            case "battlers.selected":
+                setAppStateMachine({ mode: "battle" });
                 break;
-            case 'battle.completed':
-                setAppStateMachine({ mode: 'leaderboard' });
+            case "battle.won":
+                setAppStateMachine({ mode: "leaderboard" });
+                saveBattleResults(payload.winner, payload.loser)
+                break;
+            case "battle.completed":
+                setAppStateMachine({ mode: "leaderboard" });
                 break;
             default:
                 console.warn(`Unknown message: ${message}`);
@@ -108,17 +115,23 @@ function App() {
     };
 
     React.useEffect(() => {
+
         loadCharacters();
-    }, [isDirty]);
+
+        if(battlers.length >= 2){
+            setAppStateMachine({ mode: "battle" });
+        }
+        
+    }, [isDirty, battlers, battleResults]);
 
     return html`
         <div className="container mx-auto px-36 flex flex-col text-center">
             <h1 className="text-3xl font-bold mb-6" >React Versus</h1>
-            ${appStateMachine.mode === 'leaderboard' && html`<${LeaderBoard} characters=${characters} battlers=${battlers} dispatch=${dispatch} //>`
+            ${appStateMachine.mode === "leaderboard" && html`<${LeaderBoard} characters=${characters} battlers=${battlers} battleResults=${battleResults} dispatch=${dispatch} //>`
         }
-            ${appStateMachine.mode === 'edit' && html`<${CharacterEditor} modifyingCharacter=${modifyingCharacter} dispatch=${dispatch} //>`
+            ${appStateMachine.mode === "edit" && html`<${CharacterEditor} modifyingCharacter=${modifyingCharacter} dispatch=${dispatch} //>`
         }
-            ${appStateMachine.mode === 'battle' && html`<${Battle} battlers=${battlers} dispatch=${dispatch} //>`
+            ${appStateMachine.mode === "battle" && html`<${Battle} battlers=${battlers} dispatch=${dispatch} //>`
         }
         </div>
         `

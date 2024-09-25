@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
-import { getFirestore, collection, doc, getDocs, query, orderBy, limit, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, query, orderBy, limit, addDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyANFePxXmSbZxaKwtwYzj8OpEW0rT1yWSQ",
@@ -54,18 +54,30 @@ let uploadFile = (file, callback) => {
 };
 
 let upsertCharacter = (character, callback) => {
+
+
   if(character._id){
-    delete character._id;
+    let {_id, ...dto} = character;
+
+    let docRef = doc(db, "characters", _id);
+    
+    setDoc(docRef, dto)
+      .then((ref) => {
+        if (callback) {
+          callback(ref);
+        } 
+      });
   }
+  else {
+    let collRef = collection(db, "characters");
 
-  let collRef = collection(db, "characters");
-
-  addDoc(collRef, character)
-    .then((docRef) => {
-      if (callback) {
-        callback(docRef);
-      }
-    });
+    addDoc(collRef, character)
+      .then((ref) => {
+        if (callback) {
+          callback(ref);
+        }
+      });
+  }
 }
 
 let deleteCharacter = (character, callback) => {
