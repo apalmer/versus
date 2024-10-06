@@ -125,7 +125,7 @@ function App() {
     }, [isDirty, battlers, battleResults]);
 
     return html`
-        <div className="container mx-auto px-36 flex flex-col text-center">
+        <div className="container mx-auto flex flex-col text-center">
             <h1 className="text-3xl font-bold mb-6" >React Versus</h1>
             ${appStateMachine.mode === "leaderboard" && html`<${LeaderBoard} characters=${characters} battlers=${battlers} battleResults=${battleResults} dispatch=${dispatch} //>`
         }
